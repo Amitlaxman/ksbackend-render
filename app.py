@@ -33,7 +33,24 @@ def load_mongo_documents(db, collections):
             ))
     return docs
 
-collections = [ "Building_and_Other_Construction_Workers_Act_1996_Notification", ... ]  # keep your list
+collections = [
+    "Building_and_Other_Construction_Workers_Act_1996_Notification",
+    "Building_and_Other_Construction_Workers_Act_1996_Adhisuchna",
+    "Contract_Labour_Act_1970",
+    "Contract_Labour_Act_1970_section6.2",
+    "Contract_Labour_Act_1970_section_6.1",
+    "Contract_Labour_MP_Rules_1973",
+    "MP_Govt_Info",
+    "MP_Govt_Notifications",
+    "MP_Shops_and_Establishments_Act_1958_Night_Work_Rules",
+    "MP_Shops_and_Establishments_Rules_1959_Notifications",
+    "Payment_of_Gratuity_Act_1972_Notifications",
+    "Shops_&_Establishments_Act_1958",
+    "Shops_&_Establishments_Act_1958_Notification",
+    "Shops_&_Establishments_Act_195_district"
+] # keep your list
+
+
 mongo_docs = load_mongo_documents(db, collections)
 
 # Load CSV
@@ -55,7 +72,27 @@ llm = ChatGroq(
     model="llama-3.1-8b-instant"
 )
 
-system_prompt = """..."""  # keep your existing prompt
+system_prompt = """
+You are a legal assistant chatbot for workers in Madhya Pradesh.
+            Only answer based on the context provided below.
+            If the answer is not found, clearly say "I don't know based on the law.
+Your job is to explain government schemes, worker rights, and benefits.
+
+Instructions:
+- Explain the answer in simple words.
+- Try to cite your sources if you have any.
+- Add an example or step-by-step explanation if possible.
+- If user writes in Hindi, reply in Hindi. If in English, reply in English.
+- Only answer questions that you know the answer surely to.
+- Do not site incorrect sources.
+- ONLY USE INFORMATION FROM MADHYA PRADESH GOVT.
+- https://labour.mponline.gov.in/ this is a source that can be cited.
+- https://drive.google.com/drive/folders/1F2sQADtqSS9ySo_44-kW_7UxzE3XZmxu this is another source.
+
+-If the answer is not in the provided context, reply only with:
+"I’m not sure, but I’ll pass this to an admin."
+-Do NOT try to guess or invent.
+"""
 
 qa = RetrievalQA.from_chain_type(llm=llm, retriever=combined_retriever, chain_type="stuff")
 
